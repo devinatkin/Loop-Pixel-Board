@@ -74,7 +74,6 @@ void setupCR(){
   pinMode(LOAD_RS,OUTPUT); 
 }
 
-
 uint16_t readColumn(){
   noInterrupts();
   
@@ -92,19 +91,19 @@ uint16_t readColumn(){
   col = col|(digitalRead(C1));
 
     
-  IMG[XC][YC] = col;
-
+  //IMG[XC][YC] = col;
+  interrupts();
   return col;
   }
   
- 
-
 void incrementS(){
     svals=svals+1;
     if(svals>=64){
+      // resetChip();
+      // loadCR();
       svals = 0;
       clockRS();
-      clockCS();
+      //clockCS();
     }
     if(svals == 32){
       clockRS();
@@ -114,8 +113,7 @@ void incrementS(){
 }
 
 uint16_t readRow(){
-  
-  
+    
   uint16_t row=0;
   row = row|(digitalRead(R10)<<9);
   row = row|(digitalRead(R9)<<8);
@@ -128,40 +126,50 @@ uint16_t readRow(){
   row = row|(digitalRead(R3)<<2);
   row = row|(digitalRead(R2)<<1);
   row = row|(digitalRead(R1));
-
-  IMG[XR][YR] = row;
   
-  return row;
+  //uint8_t currentS = svals;
+  //setS(YC-XR);
+  while(YC != YR){
+    clockCS();
+  }
+  
+  uint16_t col = readColumn();
+  //setS(currentS);
+  if(row == col){
+    IMG[XR][YR] = row;
+    return row;
+  }
+  else{
+    return 0xFFFF;
+  }
+  
+  
+  
+  
+  
   
     }
 
-
 void loadCR(){
+  // Assume the register starts empty. 
+  digitalWrite(RS_CLK,LOW);
+  digitalWrite(CS_CLK,LOW); 
+
   digitalWrite(LOAD_CS,HIGH);
   digitalWrite(LOAD_RS,HIGH);
 
   digitalWrite(RS_INDATA,HIGH);
   digitalWrite(CS_INDATA,HIGH); 
 
-  digitalWrite(RS_CLK,LOW);
-  digitalWrite(CS_CLK,LOW); 
-
-  
-  for(int i=0;i<64;i++){
-    digitalWrite(RS_CLK,LOW);
-    digitalWrite(CS_CLK,LOW); 
-    delay(10);
-   digitalWrite(RS_INDATA,LOW);
-   digitalWrite(CS_INDATA,LOW); 
-
-   digitalWrite(RS_CLK,HIGH);
-   digitalWrite(CS_CLK,HIGH);
-  }
+  digitalWrite(RS_CLK,HIGH);
+  digitalWrite(CS_CLK,HIGH);
 
   digitalWrite(LOAD_CS,LOW);
   digitalWrite(LOAD_RS,LOW);
-}
 
+  digitalWrite(RS_CLK,LOW);
+  digitalWrite(CS_CLK,LOW); 
+}
 
 boolean clkRS;
 void clockRS(){
@@ -190,4 +198,23 @@ void clockCS(){
   }
   digitalWrite(CS_CLK,clkCS);
    
+}
+
+#define RST_N 16
+
+//Reset the chip
+void resetChip(){
+  digitalWrite(RST_N,LOW);
+  digitalWrite(RST_N,HIGH);
+}
+
+//Run all the setup chip scripts
+void setupChip(){ 
+  setupColumn();
+  setupRow();
+  setupS();
+  pinMode(RST_N,OUTPUT);
+  resetChip();
+  setupCR();
+  loadCR();
 }

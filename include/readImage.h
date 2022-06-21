@@ -59,4 +59,9 @@ void loadCR();
 
 void clockRS();
 void clockCS();
+
+void resetChip();
+
+void setupChip();
+
 #endif

@@ -28,24 +28,19 @@ void setup()
 {
 
 
-  pinMode(RST_N,OUTPUT);
-  digitalWrite(RST_N,LOW);
-  digitalWrite(RST_N,HIGH);
+
 
   pinMode(PD,OUTPUT);
   digitalWrite(PD,LOW);
   
   pinMode(CLK_HS,OUTPUT);
   analogWriteResolution(3);
-  analogWriteFrequency(CLK_HS, 100000);
+  analogWriteFrequency(CLK_HS, 4000000);
   analogWrite(CLK_HS,5);
 
-  setupColumn();
-  setupRow();
-  setupS();
+  setupChip();
 
-  setupCR();
-  loadCR();
+
 
 
   // if (!SD.begin(sd_cs))
@@ -59,6 +54,7 @@ void setup()
     Serial.println("RA8875 Not Found!");
     while (1);
   }
+
   tft.displayOn(true);
   tft.GPIOX(true);
   tft.PWM1config(true, RA8875_PWM_CLK_DIV1024); // PWM output for backlight
@@ -67,7 +63,7 @@ void setup()
   tft.fillScreen(RA8875_WHITE);
   
   tft.textMode();
-  tft.textWrite("Sensor Text A0.6.2a",20);
+  tft.textWrite("Sensor Text A0.6.2b",20);
 
   tft.graphicsMode();
 
@@ -77,18 +73,37 @@ void setup()
 #define ImgTime 1000000
 unsigned long currentTime = 0;
 unsigned long lastImg = 0;
+unsigned long sum = 0;
+unsigned long cnt = 0;
+unsigned long diff = 0;
+unsigned long lastS = 0;
+uint16_t val = 0;
 void loop()
 {
   currentTime = micros();
-  
-  if((currentTime-lastImg)>ImgTime){
-    Serial.println("UpdateScreen");
+  diff = (currentTime-lastImg);
+  if(diff>ImgTime){
+    Serial.print(sum/cnt);
+    sum = 0;
+    cnt = 0;
+    Serial.print("\n");
     lastImg = currentTime;
     drawImage(tft,getImageRef());
     
   }
-  readRow();
-  readColumn();
-  incrementS();
+  if(currentTime - lastS > 100){
+    
+    lastS = currentTime;
+    incrementS();
+  }
+  val = readRow();
+
+  if(val != 0xFFFF){
+    sum += val;
+    cnt += 1;
+    lastS = currentTime;
+    incrementS();
+  }
+
 
 }
