@@ -40,7 +40,7 @@ void setup()
   analogWrite(CLK_HS,5);
 
   setupChip();
-
+  setupImgMax();
 
 
 
@@ -68,7 +68,7 @@ void setup()
 
   tft.graphicsMode();
 
-
+  
 }
 
 #define ImgTime 200000
