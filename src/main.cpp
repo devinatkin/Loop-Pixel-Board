@@ -92,7 +92,7 @@ void loop()
   //   incrementS();
   // }
   val = readRow();
-  
+  readColumn();
   if(val != 0xFFFF){
     sum += val;
     cnt += 1;

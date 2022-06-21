@@ -9,9 +9,10 @@ uint8_t YR = 0;
 uint8_t svals;
 
 uint16_t IMG[64][64];
+uint16_t IMGB[64][64];
 
 picture& getImageRef(){
-  return IMG;
+  return IMGB;
 }
 
 void setupColumn(){
@@ -75,7 +76,7 @@ void setupCR(){
 }
 
 uint16_t readColumn(){
-  noInterrupts();
+  
   
   uint16_t col=0;
   col = col|(digitalRead(C10)<<9);
@@ -90,10 +91,14 @@ uint16_t readColumn(){
   col = col|(digitalRead(C2)<<1);
   col = col|(digitalRead(C1));
 
-    
-  //IMG[XC][YC] = col;
-  interrupts();
-  return col;
+  if(col != 0){
+    IMG[XC][YC] = col;
+    return col;
+  }
+  else{
+    return 0xFFFF;
+  }
+
   }
 
 #include <CircularBuffer.h>
@@ -104,17 +109,31 @@ void incrementS(bool keep){
     svals=svals+1;
     if(svals>=64){
         uint8_t temp = XR+1;
+        uint8_t temp2 = YC+1;
+        
         resetChip();
         loadCR();
         
         if(temp >= 64){
           temp = 0;
+          for(int i = 0 ; i<64;i++){
+            for(int j=0;j<64;j++){
+              IMGB[i][j]=IMG[i][j];
+              IMG[i][j]=0;
+            }
+          }
         }
-        XR = 0;
+        if(temp2 >= 64){
+          temp2 = 0;
+        }
+        
 
         svals = 0;
         while(XR != temp){
           clockRS();
+        }
+        while(YC != temp2){
+          clockCS();
         }
       }
       else{
@@ -224,6 +243,8 @@ void clockCS(){
 void resetChip(){
   digitalWrite(RST_N,LOW);
   digitalWrite(RST_N,HIGH);
+  XR = 0;
+  YC = 0;
 }
 
 //Run all the setup chip scripts
