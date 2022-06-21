@@ -50,7 +50,7 @@ void setup()
   //   return;
   // }
   Serial.begin(115200);
-  Serial.println("RA8875 start");
+  //Serial.println("RA8875 start");
    if (!tft.begin(RA8875_800x480)) {
     Serial.println("RA8875 Not Found!");
     while (1);
@@ -71,7 +71,7 @@ void setup()
 
 }
 
-#define ImgTime 500000
+#define ImgTime 200000
 unsigned long currentTime = 0;
 unsigned long lastImg = 0;
 unsigned long sum = 0;
@@ -87,7 +87,7 @@ void loop()
     
     lastImg = currentTime;
     drawImage(tft,getImageRef());
-    
+    //Serial.println((micros()-lastImg)); //Get the time it takes to draw the image
   }
   // if(currentTime- lastS> 900){
   //   lastS = currentTime;

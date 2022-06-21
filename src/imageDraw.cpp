@@ -1,5 +1,8 @@
 #include "ImageDraw.h"
 
+uint16_t IMG_min[64][64];
+uint16_t IMG_max[64][64];
+
 void drawImage(Adafruit_RA8875 &tft, uint16_t (&Image)[64][64]){
   unsigned long sum = 0;
   tft.graphicsMode();
@@ -8,12 +11,23 @@ void drawImage(Adafruit_RA8875 &tft, uint16_t (&Image)[64][64]){
   for (int i=0;i<64;i++){
     for(int j = 0;j<64;j++){
       sum += Image[i][j];
+      if(Image[i][j] < IMG_min[i][j]){
+        IMG_min[i][j] = Image[i][j];
+      }
+      if(Image[i][j] > IMG_max[i][j]){
+        IMG_max[i][j] = Image[i][j];
+      }     
       color = ((Image[i][j])/32);
 
       bw = ((color & 0x1F) << 11) | ((color & 0x1F)<< 6) | (color & 0x1F);
-      tft.fillRect((5*i)+50,(5*j)+50,5,5,bw);
+      Image[i][j] = bw;
+      //tft.fillRect((5*i)+50,(5*j)+50,5,5,bw); // Does a large rectangle for each pixel 
+      //tft.drawPixel((i)+50,(j)+50,bw);
     }
+    
+    tft.drawPixels(&Image[i][0],64,50,50+i);
   }
+  //This Serial Print can be used to confirm the overall light level ia being detected
   Serial.println(sum);
   
 }
