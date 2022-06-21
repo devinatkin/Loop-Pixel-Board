@@ -95,20 +95,35 @@ uint16_t readColumn(){
   interrupts();
   return col;
   }
-  
-void incrementS(){
+
+#include <CircularBuffer.h>
+
+
+void incrementS(bool keep){
+
     svals=svals+1;
     if(svals>=64){
-      // resetChip();
-      // loadCR();
-      svals = 0;
-      clockRS();
+        uint8_t temp = XR+1;
+        resetChip();
+        loadCR();
+        
+        if(temp >= 64){
+          temp = 0;
+        }
+        XR = 0;
+
+        svals = 0;
+        while(XR != temp){
+          clockRS();
+        }
+      }
+      else{
+
+      }
+
       //clockCS();
-    }
-    if(svals == 32){
-      clockRS();
-      clockCS();  
-    }
+    
+
     setS(svals);
 }
 
@@ -129,13 +144,13 @@ uint16_t readRow(){
   
   //uint8_t currentS = svals;
   //setS(YC-XR);
-  while(YC != YR){
-    clockCS();
-  }
+  // while(YC != YR){
+  //   clockCS();
+  // }
   
-  uint16_t col = readColumn();
+  //uint16_t col = readColumn();
   //setS(currentS);
-  if(row == col){
+  if(row != 0){
     IMG[XR][YR] = row;
     return row;
   }
@@ -168,7 +183,10 @@ void loadCR(){
   digitalWrite(LOAD_RS,LOW);
 
   digitalWrite(RS_CLK,LOW);
-  digitalWrite(CS_CLK,LOW); 
+  digitalWrite(CS_CLK,LOW);
+
+  XR = 0;
+  YC = 0; 
 }
 
 boolean clkRS;

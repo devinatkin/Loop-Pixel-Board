@@ -35,7 +35,7 @@ void setup()
   
   pinMode(CLK_HS,OUTPUT);
   analogWriteResolution(3);
-  analogWriteFrequency(CLK_HS, 4000000);
+  analogWriteFrequency(CLK_HS, 2000000);
   analogWrite(CLK_HS,5);
 
   setupChip();
@@ -83,26 +83,24 @@ void loop()
   currentTime = micros();
   diff = (currentTime-lastImg);
   if(diff>ImgTime){
-    Serial.print(sum/cnt);
-    sum = 0;
-    cnt = 0;
-    Serial.print("\n");
     lastImg = currentTime;
     drawImage(tft,getImageRef());
     
   }
-  if(currentTime - lastS > 100){
-    
-    lastS = currentTime;
-    incrementS();
-  }
+  // if(currentTime- lastS> 900){
+  //   lastS = currentTime;
+  //   incrementS();
+  // }
   val = readRow();
-
+  
   if(val != 0xFFFF){
     sum += val;
     cnt += 1;
     lastS = currentTime;
-    incrementS();
+    incrementS(false);
+  }
+  else{
+    incrementS(true);
   }
 
 

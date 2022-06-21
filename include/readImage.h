@@ -50,7 +50,7 @@ void setupRow();
 void setupS();
 
 void setS(uint8_t s);
-void incrementS();
+void incrementS(bool keep);
 uint16_t readColumn();
 uint16_t readRow();
 
