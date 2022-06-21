@@ -36,7 +36,7 @@ void setup()
   
   pinMode(CLK_HS,OUTPUT);
   analogWriteResolution(3);
-  analogWriteFrequency(CLK_HS, 2000000);
+  analogWriteFrequency(CLK_HS, 10000);
   analogWrite(CLK_HS,5);
 
   setupChip();
@@ -71,7 +71,7 @@ void setup()
   
 }
 
-#define ImgTime 200000
+#define ImgTime 100000
 unsigned long currentTime = 0;
 unsigned long lastImg = 0;
 unsigned long sum = 0;

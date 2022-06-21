@@ -9,6 +9,8 @@
 #include <Adafruit_SPITFT_Macros.h>
 #include <gfxfont.h>
 
+#include <arm_math.h>
+
 void drawImage(Adafruit_RA8875 &tft, uint16_t (&Image)[64][64]);
 
 void setupImgMax();
