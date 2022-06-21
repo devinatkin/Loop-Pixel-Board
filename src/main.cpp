@@ -4,6 +4,7 @@
 
 #include "imageDraw.h"
 #include "readImage.h"
+#include <SPI.h>
 
 #define RA8875_LITE  5
 #define RA8875_WAIT 6
@@ -63,14 +64,14 @@ void setup()
   tft.fillScreen(RA8875_WHITE);
   
   tft.textMode();
-  tft.textWrite("Sensor Text A0.6.2b",20);
+  tft.textWrite("Sensor Text A0.7.0a",20);
 
   tft.graphicsMode();
 
 
 }
 
-#define ImgTime 1000000
+#define ImgTime 500000
 unsigned long currentTime = 0;
 unsigned long lastImg = 0;
 unsigned long sum = 0;
@@ -83,6 +84,7 @@ void loop()
   currentTime = micros();
   diff = (currentTime-lastImg);
   if(diff>ImgTime){
+    
     lastImg = currentTime;
     drawImage(tft,getImageRef());
     
