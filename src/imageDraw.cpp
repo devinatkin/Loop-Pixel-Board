@@ -20,9 +20,10 @@ void drawImage(Adafruit_RA8875 &tft, uint16_t (&Image)[64][64]){
   uint16_t bw;
   uint16_t range;
   float frac;
+  
   for (int i=0;i<64;i++){
     for(int j = 0;j<64;j++){
-     
+      
       if(Image[i][j] < IMG_min[i][j]){
         IMG_min[i][j] = Image[i][j];
       }
@@ -31,7 +32,7 @@ void drawImage(Adafruit_RA8875 &tft, uint16_t (&Image)[64][64]){
       }     
       //color = ((Image[i][j])/32);
       range = IMG_max[i][j] - IMG_min[i][j];
-      frac= (Image[i][j]-IMG_min[i][j])/(range*0.9);
+      frac= (Image[i][j]-IMG_min[i][j])/(range*0.5);
       color = (uint16_t)(frac * 32);
 
       sum += color;
@@ -46,6 +47,6 @@ void drawImage(Adafruit_RA8875 &tft, uint16_t (&Image)[64][64]){
     tft.drawPixels(&Image[i][0],64,50,50+i);
   }
   //This Serial Print can be used to confirm the overall light level ia being detected
-  Serial.println(sum/4096.0);
+  SerialUSB1.println(sum/4096.0);
   
 }

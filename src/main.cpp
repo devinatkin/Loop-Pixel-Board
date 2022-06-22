@@ -21,9 +21,12 @@ Adafruit_RA8875 tft = Adafruit_RA8875(RA8875_CS, RA8875_RST);
 #define RST_N 16
 //#define CLK_HS 17
 #define CLK_HS 23
-
+#define countCLKSPD 10000
+#define CLKSPDper ((1000000.0)/countCLKSPD)
 #define sd_cs 254
 
+#define NormalRun
+//#define SinglePixel
 
 void setup()
 {
@@ -36,7 +39,7 @@ void setup()
   
   pinMode(CLK_HS,OUTPUT);
   analogWriteResolution(3);
-  analogWriteFrequency(CLK_HS, 10000);
+  analogWriteFrequency(CLK_HS, countCLKSPD);
   analogWrite(CLK_HS,5);
 
   setupChip();
@@ -50,6 +53,12 @@ void setup()
   //   return;
   // }
   Serial.begin(115200);
+  SerialUSB1.begin(115200);
+  SerialUSB2.begin(115200);
+  // Serial.println("Primary Serial");
+  // SerialUSB1.println("Serial USB 1");
+  // SerialUSB2.println("Serial USB 2");
+
   //Serial.println("RA8875 start");
    if (!tft.begin(RA8875_800x480)) {
     Serial.println("RA8875 Not Found!");
@@ -64,9 +73,13 @@ void setup()
   tft.fillScreen(RA8875_WHITE);
   
   tft.textMode();
-  tft.textWrite("Sensor Text A0.7.0a",20);
-
-  tft.graphicsMode();
+  #ifdef NormalRun
+    tft.textWrite("Sensor Text A0.7.0b",20);
+    tft.graphicsMode();
+  #else
+    tft.textWrite("TEST MODE",20);
+  #endif
+  
 
   
 }
@@ -78,32 +91,57 @@ unsigned long sum = 0;
 unsigned long cnt = 0;
 unsigned long diff = 0;
 unsigned long lastS = 0;
-uint16_t val = 0;
+unsigned long val = 0;
+
+
+
 void loop()
 {
-  currentTime = micros();
-  diff = (currentTime-lastImg);
-  if(diff>ImgTime){
+  #ifdef NormalRun
+    currentTime = micros();
+    diff = (currentTime-lastImg);
+    if(diff>ImgTime){
     
-    lastImg = currentTime;
-    drawImage(tft,getImageRef());
-    //Serial.println((micros()-lastImg)); //Get the time it takes to draw the image
-  }
-  // if(currentTime- lastS> 900){
-  //   lastS = currentTime;
-  //   incrementS();
-  // }
-  val = readRow();
-  readColumn();
-  if(val != 0xFFFF){
-    sum += val;
-    cnt += 1;
-    lastS = currentTime;
-    incrementS(false);
-  }
-  else{
-    incrementS(true);
-  }
+      lastImg = currentTime;
+      drawImage(tft,getImageRef());
+      //Serial.println((micros()-lastImg)); //Get the time it takes to draw the image
+    }
+    // if(currentTime- lastS> 900){
+    //   lastS = currentTime;
+    //   incrementS();
+    // }
+   val = readRow();
+    readColumn();
+    if(val != 0xFFFF){
+      sum += val;
+      cnt += 1;
+      lastS = currentTime;
+      incrementS(false);
+    }
+    else{
+      incrementS(true);
+    }
+  #elif defined(SinglePixel)
+    currentTime = micros();
+    float TimeSinceChange = 0;
+    val = readRow();
+    
+    if(sum != val){
+      TimeSinceChange = currentTime-lastImg;
+    
+      
 
+      
+    diff = (diff * 3)+TimeSinceChange;
+    diff = (diff/4);
+    SerialUSB1.print(diff);
+    SerialUSB1.print("\n");
+
+    lastImg = currentTime;
+    }
+    sum = val;
+    
+    
+  #endif
 
 }

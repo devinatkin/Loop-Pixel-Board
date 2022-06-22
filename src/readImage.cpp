@@ -116,8 +116,12 @@ void incrementS(bool keep){
         
         if(temp >= 64){
           temp = 0;
+          SerialUSB2.print("\ni:");
           for(int i = 0 ; i<64;i++){
             for(int j=0;j<64;j++){
+              SerialUSB2.print(IMG[i][j]);
+              SerialUSB2.print(",");
+              
               IMGB[i][j]=IMG[i][j];
               IMG[i][j]=0;
             }

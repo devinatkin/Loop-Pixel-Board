@@ -1,0 +1,41 @@
+% Generate an Image
+clear()
+image = zeros([64,64]);
+minVals=1024;
+maxVals=0;
+g= imshow(image)
+truesize([300 300]);
+s = serialport("COM30",115200);
+flush(s)
+
+while true
+    data = readline(s);
+    if strlength(data) > 10
+        dt = split(data,":");
+        if dt(1) == "i"
+            pixelStrings = split(dt(2),",");
+    
+            pixels = str2double(pixelStrings(1:4096));
+            %disp(data)
+            n=1;
+            for i=1:64
+                for j=1:64
+                    image(i,j) = pixels(n);
+                    n = n +1;
+                end
+            end
+            
+            minVal = min(min(image));
+            maxVal = max(max(image));
+            if minVal <minVals
+               minVals = minVal; 
+            end
+            if maxVal > maxVals
+                maxVals = maxVal;
+            end
+            imshow(image,[minVals maxVals],InitialMagnification = 900)
+        end
+    end
+
+    
+end
