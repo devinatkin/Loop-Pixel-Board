@@ -25,8 +25,8 @@ Adafruit_RA8875 tft = Adafruit_RA8875(RA8875_CS, RA8875_RST);
 #define CLKSPDper ((1000000.0)/countCLKSPD)
 #define sd_cs 254
 
-//#define NormalRun
-#define SinglePixel
+#define NormalRun
+//#define SinglePixel
 
 void setup()
 {

@@ -25,7 +25,10 @@ void drawImage(Adafruit_RA8875 &tft, uint16_t (&Image)[64][64]){
     for(int j = 0;j<64;j++){
       
       if(Image[i][j] < IMG_min[i][j]){
-        IMG_min[i][j] = Image[i][j];
+        //if(Image[i][j] != 0){
+          IMG_min[i][j] = Image[i][j];
+        //}
+        
       }
       if(Image[i][j] > IMG_max[i][j]){
         IMG_max[i][j] = Image[i][j];

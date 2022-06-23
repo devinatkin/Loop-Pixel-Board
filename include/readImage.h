@@ -51,6 +51,9 @@ void setupS();
 
 void setS(uint8_t s);
 void incrementS(bool keep);
+
+uint16_t readRowDumb();
+uint16_t readColumnDumb();
 uint16_t readColumn();
 uint16_t readRow();
 

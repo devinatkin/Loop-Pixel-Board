@@ -77,6 +77,23 @@ void setupCR(){
   pinMode(LOAD_RS,OUTPUT); 
 }
 
+uint16_t readColumnDumb(){
+  uint16_t col=0;
+  col = col|(digitalRead(C10)<<9);
+  col = col|(digitalRead(C9)<<8);
+  col = col|(digitalRead(C8)<<7);
+  col = col|(digitalRead(C7)<<6);
+  col = col|(digitalRead(C6)<<5);
+  col = col|(digitalRead(C5)<<4);
+  
+  col = col|(digitalRead(C4)<<3);
+  col = col|(digitalRead(C3)<<2);
+  col = col|(digitalRead(C2)<<1);
+  col = col|(digitalRead(C1));
+
+  return col;
+}
+
 uint16_t readColumn(){
   
   
@@ -94,9 +111,15 @@ uint16_t readColumn(){
   col = col|(digitalRead(C1));
 
   if(col != 0){
-    //IMG[XC][YC] =col + ((micros()-lastReset)%1024);
-    IMG[XC][YC] = col;
-    return col;
+    if(col == readColumnDumb()){
+      //IMG[XC][YC] =col + ((micros()-lastReset)%1024);
+      IMG[XC][YC] = col;
+      return col;
+    }
+    else{
+      return 0xFFFF;
+    }
+
   }
   else{
     return 0xFFFF;
@@ -154,6 +177,23 @@ void incrementS(bool keep){
     setS(svals%64);
 }
 
+uint16_t readRowDumb(){
+  uint16_t row=0;
+  row = row|(digitalRead(R10)<<9);
+  row = row|(digitalRead(R9)<<8);
+  row = row|(digitalRead(R8)<<7);
+  row = row|(digitalRead(R7)<<6);
+  row = row|(digitalRead(R6)<<5);
+  row = row|(digitalRead(R5)<<4);
+  
+  row = row|(digitalRead(R4)<<3);
+  row = row|(digitalRead(R3)<<2);
+  row = row|(digitalRead(R2)<<1);
+  row = row|(digitalRead(R1));
+
+  return row;
+}
+
 uint16_t readRow(){
     
   uint16_t row=0;
@@ -178,9 +218,16 @@ uint16_t readRow(){
   //uint16_t col = readColumn();
   //setS(currentS);
   if(row != 0){
-    IMG[XR][YR] = row;
-    //IMG[XR][YR]= row+((micros()-lastReset)%1024);
-    return row;
+    if(row == readRowDumb()){
+      IMG[XR][YR] = row;
+      return row;
+    }
+    else{
+      //IMG[XR][YR]= row+((micros()-lastReset)%1024);
+      return row;
+    }
+    
+
   }
   else{
     return 0xFFFF;
