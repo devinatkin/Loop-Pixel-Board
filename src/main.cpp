@@ -111,7 +111,7 @@ void loop()
     //   incrementS();
     // }
    val = readRow();
-    readColumn();
+   val = val && readColumn();
     if(val != 0xFFFF){
       sum += val;
       cnt += 1;

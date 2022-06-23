@@ -1,15 +1,25 @@
 % Generate an Image
 clear()
 image = zeros([64,64]);
+
+imageMax = zeros([64 64]);
+imageMin = zeros([64 64]);
+
+ for i=1:64
+    for j=1:64
+        imageMin(i,j) = 1025;
+    end
+ end
 minVals=1024;
 maxVals=0;
-g= imshow(image)
+g = imshow(image)
 truesize([300 300]);
 s = serialport("COM30",115200);
 flush(s)
 
 while true
     data = readline(s);
+    flush(s)
     if strlength(data) > 10
         dt = split(data,":");
         if dt(1) == "i"
@@ -22,18 +32,21 @@ while true
                 for j=1:64
                     image(i,j) = pixels(n);
                     n = n +1;
+                    if image(i,j) < imageMin(i,j)
+                        imageMin(i,j) = image(i,j);
+                    end
+                    if image(i,j) > imageMax(i,j)
+                         imageMax(i,j) = image(i,j);
+                    end
+                    
+                    range = imageMax(i,j)-imageMin(i,j);
+                    frac=(image(i,j)-imageMin(i,j))/(range*0.5);
+                    image(i,j) = frac * 32;
                 end
             end
             
-            minVal = min(min(image));
-            maxVal = max(max(image));
-            if minVal <minVals
-               minVals = minVal; 
-            end
-            if maxVal > maxVals
-                maxVals = maxVal;
-            end
-            imshow(image,[minVals maxVals],InitialMagnification = 900)
+
+            imshow(image,InitialMagnification = 900)
         end
     end
 

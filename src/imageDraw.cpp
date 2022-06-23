@@ -30,7 +30,7 @@ void drawImage(Adafruit_RA8875 &tft, uint16_t (&Image)[64][64]){
       if(Image[i][j] > IMG_max[i][j]){
         IMG_max[i][j] = Image[i][j];
       }     
-      //color = ((Image[i][j])/32);
+      //color = ((Image[i][j]));
       range = IMG_max[i][j] - IMG_min[i][j];
       frac= (Image[i][j]-IMG_min[i][j])/(range*0.5);
       color = (uint16_t)(frac * 32);

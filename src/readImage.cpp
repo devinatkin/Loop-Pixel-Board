@@ -11,6 +11,8 @@ uint8_t svals;
 uint16_t IMG[64][64];
 uint16_t IMGB[64][64];
 
+unsigned long lastReset;
+
 picture& getImageRef(){
   return IMGB;
 }
@@ -51,7 +53,7 @@ void setupS(){
 }
 
 void setS(uint8_t s){
-  svals = s;
+  
   digitalWrite(S1,svals & 0x01);
   digitalWrite(S2,svals & 0x02);
   digitalWrite(S3,svals & 0x04);
@@ -92,6 +94,7 @@ uint16_t readColumn(){
   col = col|(digitalRead(C1));
 
   if(col != 0){
+    //IMG[XC][YC] =col + ((micros()-lastReset)%1024);
     IMG[XC][YC] = col;
     return col;
   }
@@ -107,25 +110,26 @@ uint16_t readColumn(){
 void incrementS(bool keep){
 
     svals=svals+1;
-    if(svals>=64){
+    if(svals>=124){
         uint8_t temp = XR+1;
         uint8_t temp2 = YC+1;
-        
+        lastReset = micros();
         resetChip();
         loadCR();
         
         if(temp >= 64){
           temp = 0;
-          SerialUSB2.print("\ni:");
+          SerialUSB2.print("i:");
           for(int i = 0 ; i<64;i++){
             for(int j=0;j<64;j++){
               SerialUSB2.print(IMG[i][j]);
               SerialUSB2.print(",");
               
-              IMGB[i][j]=IMG[i][j];
+              IMGB[i][j]=(IMG[i][j]);
               IMG[i][j]=0;
             }
           }
+          SerialUSB2.print(",END\n");
         }
         if(temp2 >= 64){
           temp2 = 0;
@@ -147,7 +151,7 @@ void incrementS(bool keep){
       //clockCS();
     
 
-    setS(svals);
+    setS(svals%64);
 }
 
 uint16_t readRow(){
@@ -175,6 +179,7 @@ uint16_t readRow(){
   //setS(currentS);
   if(row != 0){
     IMG[XR][YR] = row;
+    //IMG[XR][YR]= row+((micros()-lastReset)%1024);
     return row;
   }
   else{
