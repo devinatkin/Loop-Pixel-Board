@@ -25,8 +25,8 @@ Adafruit_RA8875 tft = Adafruit_RA8875(RA8875_CS, RA8875_RST);
 #define CLKSPDper ((1000000.0)/countCLKSPD)
 #define sd_cs 254
 
-#define NormalRun
-//#define SinglePixel
+//#define NormalRun
+#define SinglePixel
 
 void setup()
 {
@@ -77,7 +77,7 @@ void setup()
     tft.textWrite("Sensor Text A0.7.0b",20);
     tft.graphicsMode();
   #else
-    tft.textWrite("TEST MODE",20);
+    tft.textWrite("TEST MODE",10);
   #endif
   
 
@@ -89,7 +89,13 @@ unsigned long currentTime = 0;
 unsigned long lastImg = 0;
 unsigned long sum = 0;
 unsigned long cnt = 0;
+
+#ifdef NormalRun
 unsigned long diff = 0;
+#else
+long diff = 0;
+#endif
+
 unsigned long lastS = 0;
 unsigned long val = 0;
 
@@ -125,19 +131,30 @@ void loop()
     currentTime = micros();
     float TimeSinceChange = 0;
     val = readRow();
-    
+
+    if (val == 0xFFFF){
+      val = 0;
+    }
+    else{
+      if(val != readRow()){
+        val = 0;
+      }
+    }
     if(sum != val){
       TimeSinceChange = currentTime-lastImg;
-    
+      // diff = (diff-val);
+      // if(diff<0){
+      //   diff = diff + 1024;
+      // }
+      if(val != 0){
+        diff = val;
+      }
       
 
+      SerialUSB1.print(diff);
+      SerialUSB1.print("\n");
       
-    diff = (diff * 3)+TimeSinceChange;
-    diff = (diff/4);
-    SerialUSB1.print(diff);
-    SerialUSB1.print("\n");
-
-    lastImg = currentTime;
+      lastImg = currentTime;
     }
     sum = val;
     
