@@ -97,18 +97,7 @@ uint16_t readColumnDumb(){
 uint16_t readColumn(){
   
   
-  uint16_t col=0;
-  col = col|(digitalRead(C10)<<9);
-  col = col|(digitalRead(C9)<<8);
-  col = col|(digitalRead(C8)<<7);
-  col = col|(digitalRead(C7)<<6);
-  col = col|(digitalRead(C6)<<5);
-  col = col|(digitalRead(C5)<<4);
-  
-  col = col|(digitalRead(C4)<<3);
-  col = col|(digitalRead(C3)<<2);
-  col = col|(digitalRead(C2)<<1);
-  col = col|(digitalRead(C1));
+  uint16_t col=readColumnDumb();
 
   if(col != 0){
     if(col == readColumnDumb()){
@@ -117,11 +106,13 @@ uint16_t readColumn(){
       return col;
     }
     else{
+      //IMG[XC][YC] = IMGB[XC][YC];
       return 0xFFFF;
     }
 
   }
   else{
+    //IMG[XC][YC] = 1024;
     return 0xFFFF;
   }
 
@@ -133,7 +124,7 @@ uint16_t readColumn(){
 void incrementS(bool keep){
 
     svals=svals+1;
-    if(svals>=124){
+    if(svals>=64){
         uint8_t temp = XR+1;
         uint8_t temp2 = YC+1;
         lastReset = micros();
@@ -149,7 +140,7 @@ void incrementS(bool keep){
               SerialUSB2.print(",");
               
               IMGB[i][j]=(IMG[i][j]);
-              IMG[i][j]=0;
+              //IMG[i][j]=0;
             }
           }
           SerialUSB2.print(",END\n");
@@ -196,18 +187,7 @@ uint16_t readRowDumb(){
 
 uint16_t readRow(){
     
-  uint16_t row=0;
-  row = row|(digitalRead(R10)<<9);
-  row = row|(digitalRead(R9)<<8);
-  row = row|(digitalRead(R8)<<7);
-  row = row|(digitalRead(R7)<<6);
-  row = row|(digitalRead(R6)<<5);
-  row = row|(digitalRead(R5)<<4);
-  
-  row = row|(digitalRead(R4)<<3);
-  row = row|(digitalRead(R3)<<2);
-  row = row|(digitalRead(R2)<<1);
-  row = row|(digitalRead(R1));
+  uint16_t row=readRowDumb();
   
   //uint8_t currentS = svals;
   //setS(YC-XR);
@@ -223,13 +203,15 @@ uint16_t readRow(){
       return row;
     }
     else{
+      //IMG[XR][YR] = IMGB[XR][YR];
       //IMG[XR][YR]= row+((micros()-lastReset)%1024);
-      return row;
+      return 0xFFFF;
     }
     
 
   }
   else{
+    //IMG[XC][YC] = 1024;
     return 0xFFFF;
   }
   
@@ -312,4 +294,15 @@ void setupChip(){
   resetChip();
   setupCR();
   loadCR();
+}
+
+//Set the X,Y row
+void setCoorR(uint8_t X, uint8_t Y){
+  //IMG[XR][YR] = row;
+  //XR controlled by Clock Row
+  while (XR != X){
+    clockRS();
+  }
+  setS(Y);
+
 }

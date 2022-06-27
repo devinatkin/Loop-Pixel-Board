@@ -32,20 +32,22 @@ while true
                 for j=1:64
                     image(i,j) = pixels(n);
                     n = n +1;
-%                     if image(i,j) < imageMin(i,j)
-%                         imageMin(i,j) = image(i,j);
-%                     end
-%                     if image(i,j) > imageMax(i,j)
-%                          imageMax(i,j) = image(i,j);
-%                     end
-%                     
-%                     range = imageMax(i,j)-imageMin(i,j);
-%                     frac=(image(i,j)-imageMin(i,j))/(range);
-%                     image(i,j) = frac * 32;
-                 end
+                    if image(i,j) < imageMin(i,j)
+                        imageMin(i,j) = image(i,j);
+                    end
+                    if image(i,j) > imageMax(i,j)
+                         imageMax(i,j) = image(i,j);
+                    end
+                    
+                    range = imageMax(i,j)-imageMin(i,j);
+                    frac=(image(i,j)-imageMin(i,j))/(range);
+                    image(i,j) = frac * 32;
+                end
             end
             
-            imshow(image,InitialMagnification = 900)
+            minVal = min(min(image));
+            maxVal = max(max(image));
+            imshow(image,[InitialMagnification = 900)
         end
     end
 

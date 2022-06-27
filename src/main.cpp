@@ -25,8 +25,8 @@ Adafruit_RA8875 tft = Adafruit_RA8875(RA8875_CS, RA8875_RST);
 #define CLKSPDper ((1000000.0)/countCLKSPD)
 #define sd_cs 254
 
-#define NormalRun
-//#define SinglePixel
+//#define NormalRun
+#define SinglePixel
 
 void setup()
 {
@@ -116,27 +116,24 @@ void loop()
     //   lastS = currentTime;
     //   incrementS();
     // }
-   val = readRow();
-   val = val && readColumn();
-    if(val != 0xFFFF){
-      sum += val;
-      cnt += 1;
-      lastS = currentTime;
-      incrementS(false);
-    }
-    else{
-      incrementS(true);
-    }
+   readRow();
+   readColumn();
+
+
+  lastS = currentTime;
+  incrementS(false);
+
   #elif defined(SinglePixel)
+    setCoorR(5,5);
     currentTime = micros();
     float TimeSinceChange = 0;
-    val = readRow();
+    val = readRowDumb();
 
     if (val == 0xFFFF){
       val = 0;
     }
     else{
-      if(val != readRow()){
+      if(val != readRowDumb()){
         val = 0;
       }
     }

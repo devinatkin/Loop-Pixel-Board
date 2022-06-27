@@ -35,14 +35,14 @@ void drawImage(Adafruit_RA8875 &tft, uint16_t (&Image)[64][64]){
       }     
       //color = ((Image[i][j]));
       range = IMG_max[i][j] - IMG_min[i][j];
-      frac= (Image[i][j]-IMG_min[i][j])/(range*0.5);
+      frac= (Image[i][j]-IMG_min[i][j])/(range);
       color = (uint16_t)(frac * 32);
 
       sum += color;
 
       //Serial.println(color);
       bw = ((color & 0x1F) << 11) | ((color & 0x1F)<< 6) | (color & 0x1F);
-      Image[i][j] = 32- bw;
+      Image[i][j] = bw;
       //tft.fillRect((5*i)+50,(5*j)+50,5,5,bw); // Does a large rectangle for each pixel 
       //tft.drawPixel((i)+50,(j)+50,bw);
     }

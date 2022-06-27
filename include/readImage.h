@@ -67,4 +67,6 @@ void resetChip();
 
 void setupChip();
 
+void setCoorR(uint8_t X, uint8_t Y);
+
 #endif
