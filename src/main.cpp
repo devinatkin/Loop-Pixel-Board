@@ -26,7 +26,8 @@ Adafruit_RA8875 tft = Adafruit_RA8875(RA8875_CS, RA8875_RST);
 #define sd_cs 254
 
 //#define NormalRun
-#define SinglePixel
+//#define SinglePixel
+#define SlowImage
 
 void setup()
 {
@@ -87,17 +88,27 @@ void setup()
 #define ImgTime 100000
 unsigned long currentTime = 0;
 unsigned long lastImg = 0;
-unsigned long sum = 0;
+unsigned long sum;
 unsigned long cnt = 0;
+
+#ifdef SlowImage
+  uint8_t Xcor = 0;
+  uint8_t Ycor = 0;
+  uint8_t Average = 200;
+  uint16_t PrevVal=0;
+  uint16_t val = 0;
+  #define AveCnt 200
+#endif
 
 #ifdef NormalRun
 unsigned long diff = 0;
-#else
+#elif defined(SinglePixel)
 long diff = 0;
+unsigned long val;
 #endif
 
 unsigned long lastS = 0;
-unsigned long val = 0;
+
 
 
 
@@ -155,7 +166,49 @@ void loop()
     }
     sum = val;
     
+  #elif defined(SlowImage)  
+    setCoorR(5,5);
+    unsigned long pixel = 0;
+    unsigned long pixel_cnt = 0;
+    Average = AveCnt;
+    while(Average){
+      val =  readRowDumb();
+      if(val != readRowDumb()){
+        val = 0;
+      }
+
+      if(PrevVal != val){
+        pixel += val;
+        pixel_cnt += 1;
+        Average = Average - 1;
+      }
+      //Average = Average - 1;
+      PrevVal = val;
+    }
+    double pixelValue;
+    if(pixel_cnt > 0){
+      pixelValue = pixel;
+    }
+    else{
+      pixelValue = pixel;
+    }
     
+    //SerialUSB1.print("");
+    SerialUSB1.print(Xcor);
+    SerialUSB1.print(",");
+    SerialUSB1.print(Ycor);
+    SerialUSB1.print(",");
+    SerialUSB1.print(pixelValue);
+    SerialUSB1.print("\n");
+
+    Xcor = Xcor + 1;
+    if(Xcor >= 64){
+      Xcor = 0;
+      Ycor = Ycor + 1;
+      if(Ycor >= 64){
+        Ycor = 0;
+      }
+    }
   #endif
 
 }
