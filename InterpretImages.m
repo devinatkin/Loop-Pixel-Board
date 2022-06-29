@@ -44,8 +44,9 @@ while true
 %                     image(i,j) = frac * 32;
                  end
             end
-            
-            imshow(image,InitialMagnification = 900)
+            minVal = min(min(image));
+            maxVal = max(max(image));
+            imshow(image,DisplayRange=[minVal maxVal],InitialMagnification = 900)
         end
     end
 

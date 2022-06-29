@@ -98,6 +98,7 @@ unsigned long cnt = 0;
   uint16_t PrevVal=0;
   uint16_t val = 0;
   #define AveCnt 200
+  long diff = 0;
 #endif
 
 #ifdef NormalRun
@@ -167,48 +168,66 @@ void loop()
     sum = val;
     
   #elif defined(SlowImage)  
-    setCoorR(5,5);
-    unsigned long pixel = 0;
-    unsigned long pixel_cnt = 0;
-    Average = AveCnt;
-    while(Average){
-      val =  readRowDumb();
+
+    setCoorR(Xcor,Ycor);
+    currentTime = micros();
+   
+    val = readRowDumb();
+
+    if (val == 0xFFFF){
+      val = 0;
+    }
+    else{
       if(val != readRowDumb()){
         val = 0;
       }
-
-      if(PrevVal != val){
-        pixel += val;
-        pixel_cnt += 1;
-        Average = Average - 1;
+    }
+    if(PrevVal != val){
+      
+      // diff = (diff-val);
+      // if(diff<0){
+      //   diff = diff + 1024;
+      // }
+      if(val != 0){
+        diff = val;
+        sum = sum + val;
+        cnt = cnt + 1;
       }
-      //Average = Average - 1;
-      PrevVal = val;
+      Average = Average - 1;
+      if(Average == 0){
+        Average = AveCnt;
+        SerialUSB1.print(Xcor);
+        SerialUSB1.print(",");
+        SerialUSB1.print(Ycor);
+        SerialUSB1.print(",");
+        SerialUSB1.print(sum);
+        SerialUSB1.print(",");
+        SerialUSB1.print(cnt);
+        SerialUSB1.print("\n");
+
+        sum = 0;
+        cnt = 0;
+
+        Xcor = Xcor + 1;
+        if(Xcor >= 64){
+          Xcor = 0;
+          Ycor = Ycor + 1;
+          if(Ycor >= 64){
+            Ycor = 0;
+        }
     }
-    double pixelValue;
-    if(pixel_cnt > 0){
-      pixelValue = pixel;
+      }
+
+      
+      lastImg = currentTime;
     }
-    else{
-      pixelValue = pixel;
-    }
-    
+    PrevVal = val;
     //SerialUSB1.print("");
-    SerialUSB1.print(Xcor);
-    SerialUSB1.print(",");
-    SerialUSB1.print(Ycor);
-    SerialUSB1.print(",");
-    SerialUSB1.print(pixelValue);
-    SerialUSB1.print("\n");
 
-    Xcor = Xcor + 1;
-    if(Xcor >= 64){
-      Xcor = 0;
-      Ycor = Ycor + 1;
-      if(Ycor >= 64){
-        Ycor = 0;
-      }
-    }
+    // SerialUSB1.print(pixelValue);
+    // SerialUSB1.print("\n");
+
+
   #endif
 
 }
