@@ -98,18 +98,14 @@ uint16_t readColumn(){
   
   
   uint16_t col=readColumnDumb();
-
+while(col != readColumnDumb()){
+  col = readColumnDumb();
+}
   if(col != 0){
-    if(col == readColumnDumb()){
+    
       //IMG[XC][YC] =col + ((micros()-lastReset)%1024);
       IMG[XC][YC] = col;
       return col;
-    }
-    else{
-      //IMG[XC][YC] = IMGB[XC][YC];
-      return 0xFFFF;
-    }
-
   }
   else{
     //IMG[XC][YC] = 1024;
@@ -124,7 +120,7 @@ uint16_t readColumn(){
 void incrementS(bool keep){
 
     svals=svals+1;
-    if(svals>=64){
+    if(svals>=128){
         uint8_t temp = XR+1;
         uint8_t temp2 = YC+1;
         lastReset = micros();
@@ -188,7 +184,9 @@ uint16_t readRowDumb(){
 uint16_t readRow(){
     
   uint16_t row=readRowDumb();
-  
+  while(row!= readRowDumb()){
+    row = readRowDumb();
+  }
   //uint8_t currentS = svals;
   //setS(YC-XR);
   // while(YC != YR){
@@ -198,17 +196,8 @@ uint16_t readRow(){
   //uint16_t col = readColumn();
   //setS(currentS);
   if(row != 0){
-    if(row == readRowDumb()){
-      IMG[XR][YR] = row;
-      return row;
-    }
-    else{
-      //IMG[XR][YR] = IMGB[XR][YR];
-      //IMG[XR][YR]= row+((micros()-lastReset)%1024);
-      return 0xFFFF;
-    }
-    
-
+    IMG[XR][YR] = row;
+    return row;
   }
   else{
     //IMG[XC][YC] = 1024;

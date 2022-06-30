@@ -41,7 +41,7 @@ while true
                     
                     range = imageMax(i,j)-imageMin(i,j);
                     frac=(image(i,j)-imageMin(i,j))/(range);
-                    image(i,j) = frac * 32;
+                    image(i,j) = frac * 1024;
                  end
             end
              minVal = min(min(image));

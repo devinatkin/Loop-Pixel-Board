@@ -21,13 +21,14 @@ Adafruit_RA8875 tft = Adafruit_RA8875(RA8875_CS, RA8875_RST);
 #define RST_N 16
 //#define CLK_HS 17
 #define CLK_HS 23
-#define countCLKSPD 10000
+#define countCLKSPD 420000
 #define CLKSPDper ((1000000.0)/countCLKSPD)
 #define sd_cs 254
 
-//#define NormalRun
+#define NormalRun
 //#define SinglePixel
-#define SlowImage
+//#define SlowImage
+//#define FreqImage
 
 void setup()
 {
@@ -39,7 +40,7 @@ void setup()
   digitalWrite(PD,LOW);
   
   pinMode(CLK_HS,OUTPUT);
-  analogWriteResolution(3);
+  analogWriteResolution(4);
   analogWriteFrequency(CLK_HS, countCLKSPD);
   analogWrite(CLK_HS,5);
 
@@ -97,7 +98,7 @@ unsigned long cnt = 0;
   uint8_t Average = 200;
   uint16_t PrevVal=0;
   uint16_t val = 0;
-  #define AveCnt 200
+  #define AveCnt 50
   long diff = 0;
 #endif
 
@@ -105,7 +106,18 @@ unsigned long cnt = 0;
 unsigned long diff = 0;
 #elif defined(SinglePixel)
 long diff = 0;
+uint8_t Xcor = 32;
+uint8_t Ycor = 32;
 unsigned long val;
+#elif defined(FreqImage)
+
+uint16_t val = 0;
+uint32_t freq = 1000;
+uint8_t Xcor = 32;
+uint8_t Ycor = 32;
+
+unsigned long lastTick;
+
 #endif
 
 unsigned long lastS = 0;
@@ -115,8 +127,9 @@ unsigned long lastS = 0;
 
 void loop()
 {
+  currentTime = micros();
   #ifdef NormalRun
-    currentTime = micros();
+    
     diff = (currentTime-lastImg);
     if(diff>ImgTime){
     
@@ -136,37 +149,44 @@ void loop()
   incrementS(false);
 
   #elif defined(SinglePixel)
-    setCoorR(5,5);
-    currentTime = micros();
-    float TimeSinceChange = 0;
-    val = readRowDumb();
-
-    if (val == 0xFFFF){
-      val = 0;
-    }
-    else{
-      if(val != readRowDumb()){
-        val = 0;
-      }
+    setCoorR(Xcor,Ycor);
+    while(val != readRowDumb()){
+      val = readRowDumb();
+      delay(1);
     }
     if(sum != val){
-      TimeSinceChange = currentTime-lastImg;
-      // diff = (diff-val);
-      // if(diff<0){
-      //   diff = diff + 1024;
-      // }
+
       if(val != 0){
         diff = val;
       }
       
 
-      SerialUSB1.print(diff);
-      SerialUSB1.print("\n");
+        SerialUSB1.print(Xcor);
+        SerialUSB1.print(",");
+        SerialUSB1.print(Ycor);
+        SerialUSB1.print(",");
+        SerialUSB1.print(diff);
+        // SerialUSB1.print(",");
+        // SerialUSB1.print(cnt);
+        SerialUSB1.print("\n");
       
-      lastImg = currentTime;
+      
     }
     sum = val;
-    
+
+    if(currentTime - lastImg > 4000){
+      lastImg = currentTime;
+      Xcor = Xcor + 1;
+        if(Xcor >= 16){
+          Xcor = 0;
+          Ycor = Ycor + 1;
+          if(Ycor >= 16){
+            Ycor = 0;
+        }
+    }
+
+    }
+
   #elif defined(SlowImage)  
 
     setCoorR(Xcor,Ycor);
@@ -227,6 +247,63 @@ void loop()
     // SerialUSB1.print(pixelValue);
     // SerialUSB1.print("\n");
 
+  #elif defined(FreqImage)
+  setCoorR(Xcor,Ycor);
+  analogWriteFrequency(CLK_HS, freq);
+  while(val != readRowDumb()){
+    val = readRowDumb();
+  }
+  //if(val != 0){
+    if(val > 41){
+      freq = freq - 5;
+    }
+    else if(val < 39){
+      freq = freq + 5;
+    }
+    else{
+        lastTick = currentTime;
+        SerialUSB1.print(Xcor);
+        SerialUSB1.print(",");
+        SerialUSB1.print(Ycor);
+        SerialUSB1.print(",");
+        SerialUSB1.print(freq);
+        SerialUSB1.print(",");
+        SerialUSB1.print(val);
+        SerialUSB1.print("\n");
+      
+      Xcor = Xcor + 1;
+      if(Xcor >= 64){
+        Xcor = 0;
+        Ycor = Ycor + 1;
+        if(Ycor >= 64){
+          Ycor = 0;
+        }
+      }
+      delay(1);
+    }
+
+    if((currentTime - lastTick) > 1000000){
+      lastTick = currentTime;
+        SerialUSB1.print(Xcor);
+        SerialUSB1.print(",");
+        SerialUSB1.print(Ycor);
+        SerialUSB1.print(",");
+        SerialUSB1.print(freq);
+        SerialUSB1.print(",");
+        SerialUSB1.print(val);
+        SerialUSB1.print("\n");
+      
+      Xcor = Xcor + 1;
+      if(Xcor >= 64){
+        Xcor = 0;
+        Ycor = Ycor + 1;
+        if(Ycor >= 64){
+          Ycor = 0;
+        }
+      }
+    }
+
+    delay(5);
 
   #endif
 
