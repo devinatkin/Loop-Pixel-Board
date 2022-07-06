@@ -76,7 +76,7 @@ void setup()
   
   tft.textMode();
   #ifdef NormalRun
-    tft.textWrite("Sensor Text A0.7.0b",20);
+    tft.textWrite("Sensor Text A0.8.0b",20);
     tft.graphicsMode();
   #else
     tft.textWrite("TEST MODE",10);
