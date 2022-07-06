@@ -147,12 +147,14 @@ void incrementS(bool keep){
         
 
         svals = 0;
+        
         while(XR != temp){
           clockRS();
         }
         while(YC != temp2){
           clockCS();
         }
+        delay(1);
       }
       else{
 
@@ -211,7 +213,7 @@ uint16_t readRow(){
   
     }
 
-void loadCR(){
+void loadCR(uint8_t XRs = 0, uint8_t YCs = 0){
   // Assume the register starts empty. 
   digitalWrite(RS_CLK,LOW);
   digitalWrite(CS_CLK,LOW); 
@@ -233,6 +235,13 @@ void loadCR(){
 
   XR = 0;
   YC = 0; 
+
+  while(XR < XRs){
+    clockRS();
+  }
+  while(YC < YCs){
+    clockCS();
+  }
 }
 
 boolean clkRS;

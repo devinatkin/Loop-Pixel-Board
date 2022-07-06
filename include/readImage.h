@@ -58,7 +58,7 @@ uint16_t readColumn();
 uint16_t readRow();
 
 void setupCR();
-void loadCR();
+void loadCR(uint8_t XRs = 0, uint8_t YCs = 0);
 
 void clockRS();
 void clockCS();

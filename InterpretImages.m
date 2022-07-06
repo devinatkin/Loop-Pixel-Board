@@ -41,12 +41,13 @@ while true
                     
                     range = imageMax(i,j)-imageMin(i,j);
                     frac=(image(i,j)-imageMin(i,j))/(range);
-                    image(i,j) = frac * 32;
+                    image(i,j) = frac * 128;
+                    image(i,j) = 128 - image(i,j); 
                  end
             end
              minVal = min(min(image));
              maxVal = max(max(image));
-            imshow(image,DisplayRange=[0 32],InitialMagnification = 900)
+            imshow(image,DisplayRange=[0 128],InitialMagnification = 900)
         end
     end
 
