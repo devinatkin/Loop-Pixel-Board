@@ -140,10 +140,7 @@ void incrementS(bool keep){
           clockCS();
         }
       }
-      else{
-
-      }
-
+    
       //clockCS();
     
 
