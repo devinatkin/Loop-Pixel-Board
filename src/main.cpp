@@ -21,7 +21,7 @@ Adafruit_RA8875 tft = Adafruit_RA8875(RA8875_CS, RA8875_RST);
 #define RST_N 16
 //#define CLK_HS 17
 #define CLK_HS 23
-#define countCLKSPD 10000
+#define countCLKSPD 4000000
 #define CLKSPDper ((1000000.0)/countCLKSPD)
 #define sd_cs 254
 
@@ -60,25 +60,25 @@ void setup()
   // SerialUSB2.println("Serial USB 2");
 
   //Serial.println("RA8875 start");
-   if (!tft.begin(RA8875_800x480)) {
-    Serial.println("RA8875 Not Found!");
-    while (1);
-  }
+  //  if (!tft.begin(RA8875_800x480)) {
+  //   Serial.println("RA8875 Not Found!");
+  //   while (1);
+  // }
 
-  tft.displayOn(true);
-  tft.GPIOX(true);
-  tft.PWM1config(true, RA8875_PWM_CLK_DIV1024); // PWM output for backlight
-  tft.PWM1out(255);
+  // tft.displayOn(true);
+  // tft.GPIOX(true);
+  // tft.PWM1config(true, RA8875_PWM_CLK_DIV1024); // PWM output for backlight
+  // tft.PWM1out(255);
 
-  tft.fillScreen(RA8875_WHITE);
+  // tft.fillScreen(RA8875_WHITE);
   
-  tft.textMode();
-  #ifdef NormalRun
-    tft.textWrite("Sensor Text A0.7.0b",20);
-    tft.graphicsMode();
-  #else
-    tft.textWrite("TEST MODE",20);
-  #endif
+  // tft.textMode();
+  // #ifdef NormalRun
+  //   tft.textWrite("Sensor Text A0.7.0b",20);
+  //   tft.graphicsMode();
+  // #else
+  //   tft.textWrite("TEST MODE",20);
+  // #endif
   
 
   
@@ -103,7 +103,7 @@ void loop()
     if(diff>ImgTime){
     
       lastImg = currentTime;
-      drawImage(tft,getImageRef());
+      //drawImage(tft,getImageRef());
       //Serial.println((micros()-lastImg)); //Get the time it takes to draw the image
     }
     // if(currentTime- lastS> 900){

@@ -76,7 +76,9 @@ void setupCR(){
 }
 
 uint16_t readColumn(){
-  
+  if(IMG[XC][YC] != 0){
+    return 0xFFFF;
+  }
   
   uint16_t col=0;
   col = col|(digitalRead(C10)<<9);
@@ -116,7 +118,7 @@ void incrementS(bool keep){
         
         if(temp >= 64){
           temp = 0;
-          SerialUSB2.print("\ni:");
+          SerialUSB2.print("i:");
           for(int i = 0 ; i<64;i++){
             for(int j=0;j<64;j++){
               SerialUSB2.print(IMG[i][j]);
@@ -126,6 +128,7 @@ void incrementS(bool keep){
               IMG[i][j]=0;
             }
           }
+          SerialUSB2.print("\n");
         }
         if(temp2 >= 64){
           temp2 = 0;
@@ -145,10 +148,14 @@ void incrementS(bool keep){
     
 
     setS(svals);
+
+
 }
 
 uint16_t readRow(){
-    
+  if(IMG[XR][YR] != 0){ //Dont Read when something's already there
+    return 0xFFFF;
+  }
   uint16_t row=0;
   row = row|(digitalRead(R10)<<9);
   row = row|(digitalRead(R9)<<8);
